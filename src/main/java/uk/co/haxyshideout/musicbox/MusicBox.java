@@ -3,26 +3,25 @@ package uk.co.haxyshideout.musicbox;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.args.GenericArguments;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import uk.co.haxyshideout.musicbox.commands.DiscListCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveRadioCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveSongCommand;
 import uk.co.haxyshideout.musicbox.commands.PlaySongCommand;
 import uk.co.haxyshideout.musicbox.commands.ReloadSongsCommand;
-import uk.co.haxyshideout.musicbox.commands.DiscListCommand;
 import uk.co.haxyshideout.musicbox.eventhandlers.EventHandler;
 import uk.co.haxyshideout.musicbox.store.SongStore;
 
 @Plugin(name = "MusicBox", id = "musicbox", version = "0.1")
 public class MusicBox {
 
-    @Inject
-    public Game game;
     @Inject
     public Logger logger;
     private static MusicBox instance;
@@ -33,17 +32,32 @@ public class MusicBox {
     }
 
     public Game getGame() {
-        return game;
+        return Sponge.getGame();
     }
 
+    /*
+    TODO
+    make it so the player unlocks music tracks by putting the discs into the jukebox, then display the list of songs they have unlocked when they
+    click the jukebox, add discs to dung gen?
+
+     */
     @Listener
     public void onStarted(GamePostInitializationEvent event) {
         instance = this;
         songStore = new SongStore();
 
-        game.getEventManager().registerListeners(this, new EventHandler());
+        getGame().getEventManager().registerListeners(this, new EventHandler());
 
-        CommandService commandDispatcher = game.getCommandDispatcher();
+        registerCommands();
+        registerDrops();
+    }
+
+    private void registerDrops() {
+
+    }
+
+    private void registerCommands() {
+        CommandManager commandDispatcher = getGame().getCommandManager();
         CommandSpec songListSpec = CommandSpec.builder().executor(new DiscListCommand()).build();
         commandDispatcher.register(this, songListSpec, "disclist");
 

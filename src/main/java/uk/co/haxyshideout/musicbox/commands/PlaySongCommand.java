@@ -1,13 +1,13 @@
 package uk.co.haxyshideout.musicbox.commands;
 
-import com.xxmicloxx.NoteBlockAPI.RadioSongPlayer;
-import com.xxmicloxx.NoteBlockAPI.Song;
+import com.xxmicloxx.NoteBlockAPI.players.RadioSongPlayer;
+import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
 import uk.co.haxyshideout.musicbox.MusicBox;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class PlaySongCommand implements CommandExecutor {
 
-    private final HashMap<UUID, RadioSongPlayer> radioSongPlayers = new HashMap<>();
+    public static final HashMap<UUID, RadioSongPlayer> radioSongPlayers = new HashMap<>();
 
     @Override public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if(!(src instanceof Player))

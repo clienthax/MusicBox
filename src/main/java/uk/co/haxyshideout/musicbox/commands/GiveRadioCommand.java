@@ -6,11 +6,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
 import uk.co.haxyshideout.musicbox.MusicBox;
 
 public class GiveRadioCommand implements CommandExecutor {
@@ -20,7 +20,7 @@ public class GiveRadioCommand implements CommandExecutor {
             return CommandResult.success();
         Player player = (Player) src;
         @SuppressWarnings("ConstantConditions")
-        ItemStack radio = MusicBox.getInstance().game.getRegistry().createBuilder(ItemStack.Builder.class).itemType(ItemTypes.JUKEBOX).quantity(1)
+        ItemStack radio = MusicBox.getInstance().getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ItemTypes.JUKEBOX).quantity(1)
                 .build();
         //noinspection ConstantConditions
         radio.offer(Keys.DISPLAY_NAME, Texts.of("Radio"));

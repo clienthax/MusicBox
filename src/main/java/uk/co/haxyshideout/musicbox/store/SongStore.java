@@ -3,15 +3,15 @@ package uk.co.haxyshideout.musicbox.store;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.xxmicloxx.NoteBlockAPI.NBSDecoder;
-import com.xxmicloxx.NoteBlockAPI.Song;
+import com.xxmicloxx.NoteBlockAPI.decoders.nbs.NBSDecoder;
+import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.command.CommandSource;
 import uk.co.haxyshideout.musicbox.MusicBox;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class SongStore {
 
     public void loadSongs() {
         songs.clear();
-        MusicBox.getInstance().game.getScheduler().createTaskBuilder().async().execute(() -> {
+        MusicBox.getInstance().getGame().getScheduler().createTaskBuilder().async().execute(() -> {
             File songFolder = new File(".", "NoteBlockSongs");
             if (!songFolder.exists() && !songFolder.mkdirs()) {
                 MusicBox.getInstance().getLogger().error("Failed to create NoteBlockSongs folder at "+songFolder.getAbsolutePath());
@@ -54,7 +54,7 @@ public class SongStore {
 
     private void buildPaginatedLists() {
         Collection<String> songNames = getSongNames();
-        PaginationService paginationService = MusicBox.getInstance().game.getServiceManager().provide(PaginationService.class).get();
+        PaginationService paginationService = MusicBox.getInstance().getGame().getServiceManager().provide(PaginationService.class).get();
 
         List<Text> giveSongCommandTexts = Lists.newArrayList();
         for(String songName : songNames) {

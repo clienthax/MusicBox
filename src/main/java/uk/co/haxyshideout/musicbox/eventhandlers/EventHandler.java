@@ -1,25 +1,29 @@
 package uk.co.haxyshideout.musicbox.eventhandlers;
 
-import com.xxmicloxx.NoteBlockAPI.NoteBlockSongPlayer;
-import com.xxmicloxx.NoteBlockAPI.Song;
-import net.minecraft.block.BlockJukebox;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import com.xxmicloxx.NoteBlockAPI.players.NoteBlockSongPlayer;
+import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
+import net.minecraftforge.event.world.BlockEvent;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import uk.co.haxyshideout.musicbox.MusicBox;
+import uk.co.haxyshideout.musicbox.commands.PlaySongCommand;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -29,8 +33,23 @@ public class EventHandler {
 
     @Listener
     public void onPlayerLogout(ClientConnectionEvent.Disconnect event) {
-        if(noteBlockPlayers.containsKey(event.getTargetEntity().getUniqueId()))
-            noteBlockPlayers.get(event.getTargetEntity().getUniqueId()).setPlaying(false);
+        if(PlaySongCommand.radioSongPlayers.containsKey(event.getTargetEntity().getUniqueId()))
+            PlaySongCommand.radioSongPlayers.get(event.getTargetEntity().getUniqueId()).setPlaying(false);
+    }
+
+    //If the jukebox is broke, stop the song playing
+    @Listener
+    public void onJukeboxBroke(ChangeBlockEvent.Break event) {
+        for (Transaction<BlockSnapshot> blockSnapshotTransaction : event.getTransactions()) {
+            if (blockSnapshotTransaction.getOriginal().getState().getType() != BlockTypes.JUKEBOX) {
+                return;
+            }
+            Location<World> jukeboxLocation = blockSnapshotTransaction.getOriginal().getLocation().get();
+            if(noteBlockPlayers.containsKey(jukeboxLocation)) {
+                noteBlockPlayers.get(jukeboxLocation).setPlaying(false);
+                noteBlockPlayers.remove(jukeboxLocation);
+            }
+        }
     }
 
     @Listener
@@ -40,7 +59,7 @@ public class EventHandler {
             Optional<ItemStack> itemInHand = player.getItemInHand();
             //noinspection ConstantConditions
             if(itemInHand.isPresent() && itemInHand.get().getItem() == ItemTypes
-                    .JUKEBOX && itemInHand.get().get(DisplayNameData.class).isPresent ()) {
+                    .JUKEBOX && itemInHand.get().get(Keys.DISPLAY_NAME).isPresent ()) {
                 String itemName = Texts.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
                 if(itemName.equals("Radio")) {
                     event.setCancelled(true);
@@ -63,23 +82,14 @@ public class EventHandler {
             //Check that the item in the players hand is a record and that it has a custom display name
             Optional<ItemStack> itemInHand = player.getItemInHand();
             Location<World> jukeboxLocation = event.getTargetBlock().getLocation().get();
-            BlockJukebox.TileEntityJukebox tileEntityJukebox =
-                    (BlockJukebox.TileEntityJukebox) jukeboxLocation.getTileEntity().get();
             //Only insert the disc if the jukebox doesn't have a disc inside it
-            if (tileEntityJukebox.getRecord() == null) {
-                if (itemInHand.isPresent() && itemInHand.get().getItem() == ItemTypes.RECORD_CAT && itemInHand.get().get(DisplayNameData.class)
+            if (!jukeboxLocation.get(Keys.REPRESENTED_ITEM).isPresent()) {
+                if (itemInHand.isPresent() && itemInHand.get().getItem() == ItemTypes.RECORD_CAT && itemInHand.get().get(Keys.DISPLAY_NAME)
                         .isPresent()) {
                     event.setCancelled(true);
 
                     //Set the record into the tile entity, need to do it this way as the normal insert removes the name tag
-                    tileEntityJukebox.setRecord((net.minecraft.item.ItemStack) itemInHand.get());
-
-                    //Set the state of the block to having a record
-                    BlockPos jukeboxPos = new BlockPos(jukeboxLocation.getBlockX(), jukeboxLocation.getBlockY(), jukeboxLocation.getBlockZ());
-                    ((net.minecraft.world.World) event.getTargetBlock().getLocation().get().getExtent())
-                            .setBlockState(jukeboxPos, ((IBlockState) event.getTargetBlock().getState())
-                                    .withProperty(BlockJukebox.HAS_RECORD, true), 2);
-
+                    jukeboxLocation.offer(Keys.REPRESENTED_ITEM, itemInHand.get().createSnapshot());
 
                     //Remove the disc from the players hand
                     player.setItemInHand(null);
@@ -97,9 +107,17 @@ public class EventHandler {
                         NoteBlockSongPlayer noteBlockSongPlayer = new NoteBlockSongPlayer(song.get());
                         noteBlockSongPlayer.setNoteBlockLocation(jukeboxLocation);
                         noteBlockSongPlayer.setAreaMusic(true);
+                        noteBlockSongPlayer.setLooped(true);
                         noteBlockSongPlayer.setPlaying(true);
                         noteBlockPlayers.put(jukeboxLocation, noteBlockSongPlayer);
-                        player.sendMessage(ChatTypes.ACTION_BAR, Texts.of("Now Playing: "+songName));
+
+                        //Send the Now Playing message to everyone within 16 blocks
+                        Collection<Entity> playersInRange = player.getWorld().getEntities( entity -> entity instanceof Player
+                                        && entity.getLocation().getPosition().distance(jukeboxLocation.getPosition()) < 16);
+                        for(Entity entity : playersInRange) {
+                            ((Player) entity).sendMessage(ChatTypes.ACTION_BAR, Texts.of(TextColors.AQUA, "Now Playing: " + songName));
+                        }
+
                     }
                 }
             } else {
