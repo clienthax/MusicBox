@@ -35,21 +35,24 @@ public class SongStore {
     }
 
     public void loadSongs() {
+        MusicBox musicBox = MusicBox.getInstance();
         songs.clear();
-        MusicBox.getInstance().getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-            File songFolder = new File(".", "NoteBlockSongs");
+        musicBox.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
+            File songFolder = new File(musicBox.getConfigFolder(), "NoteBlockSongs");
             if (!songFolder.exists() && !songFolder.mkdirs()) {
-                MusicBox.getInstance().getLogger().error("Failed to create NoteBlockSongs folder at "+songFolder.getAbsolutePath());
+                musicBox.getLogger().error("Failed to create NoteBlockSongs folder at "+songFolder.getAbsolutePath());
                 return;
             }
-            for (File file : songFolder.listFiles()) {
+            File[] fileList  = songFolder.listFiles();
+            musicBox.getLogger().info("Loading "+fileList.length+" songs from folder "+songFolder.getAbsolutePath());
+            for (File file : fileList) {
                 Song song = NBSDecoder.parse(file);
                 String songName = file.getName().substring(0, file.getName().length() - 4);
                 songs.put(songName, song);
-                MusicBox.getInstance().getLogger().debug("Loaded song "+songName);
+                musicBox.getLogger().debug("Loaded song "+songName);
             }
             buildPaginatedLists();
-        }).submit(MusicBox.getInstance());
+        }).submit(musicBox);
     }
 
     private void buildPaginatedLists() {

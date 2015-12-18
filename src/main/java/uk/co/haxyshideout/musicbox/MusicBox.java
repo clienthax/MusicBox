@@ -7,6 +7,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -19,11 +20,17 @@ import uk.co.haxyshideout.musicbox.commands.ReloadSongsCommand;
 import uk.co.haxyshideout.musicbox.eventhandlers.EventHandler;
 import uk.co.haxyshideout.musicbox.store.SongStore;
 
+import java.io.File;
+
 @Plugin(name = "MusicBox", id = "musicbox", version = "0.1")
 public class MusicBox {
 
     @Inject
     public Logger logger;
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private File configFolder;
+
     private static MusicBox instance;
     private SongStore songStore;
 
@@ -35,8 +42,12 @@ public class MusicBox {
         return Sponge.getGame();
     }
 
+    public File getConfigFolder() {
+        return configFolder;
+    }
+
     /*
-    TODO
+    TODO / IDEAS
     make it so the player unlocks music tracks by putting the discs into the jukebox, then display the list of songs they have unlocked when they
     click the jukebox, add discs to dung gen?
 
@@ -58,26 +69,37 @@ public class MusicBox {
 
     private void registerCommands() {
         CommandManager commandDispatcher = getGame().getCommandManager();
-        CommandSpec songListSpec = CommandSpec.builder().executor(new DiscListCommand()).build();
+        CommandSpec songListSpec = CommandSpec.builder()
+                .permission("musicbox.songlist")
+                .executor(new DiscListCommand())
+                .build();
         commandDispatcher.register(this, songListSpec, "disclist");
 
         CommandSpec giveSongSpec = CommandSpec.builder().arguments(
                 GenericArguments.onlyOne(GenericArguments.string(Texts.of("songName"))))
+                .permission("musicbox.songlist")
                 .executor(new GiveSongCommand())
                 .build();
         commandDispatcher.register(this, giveSongSpec, "givesong");
 
         CommandSpec playSongSpec = CommandSpec.builder().arguments(
                 GenericArguments.onlyOne(GenericArguments.string(Texts.of("songName"))))
+                .permission("musicbox.radio")
                 .executor(new PlaySongCommand())
                 .build();
         commandDispatcher.register(this, playSongSpec, "playsong");
 
-        CommandSpec reloadSongsSpec = CommandSpec.builder().permission("musicbox.admin").executor(new ReloadSongsCommand()).build();
-        commandDispatcher.register(this, reloadSongsSpec, "reloadsongs");
-
-        CommandSpec radioSongsSpec = CommandSpec.builder().permission("musicbox.radio").executor(new GiveRadioCommand()).build();
+        CommandSpec radioSongsSpec = CommandSpec.builder()
+                .permission("musicbox.radio")
+                .executor(new GiveRadioCommand())
+                .build();
         commandDispatcher.register(this, radioSongsSpec, "giveradio");
+
+        CommandSpec reloadSongsSpec = CommandSpec.builder()
+                .permission("musicbox.admin")
+                .executor(new ReloadSongsCommand())
+                .build();
+        commandDispatcher.register(this, reloadSongsSpec, "reloadsongs");
     }
 
     public Logger getLogger() {
