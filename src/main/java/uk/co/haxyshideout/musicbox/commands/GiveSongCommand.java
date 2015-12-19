@@ -35,7 +35,7 @@ public class GiveSongCommand implements CommandExecutor {
                                 .quantity(1).build();
                 Text name = Texts.of(songName.get());
                 record.offer(Keys.DISPLAY_NAME, name);
-                ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) record);
+                ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) (Object) record);
             } else {
                 player.sendMessage(Texts.of("No song by the name of "+songName.get()+" was found."));
             }

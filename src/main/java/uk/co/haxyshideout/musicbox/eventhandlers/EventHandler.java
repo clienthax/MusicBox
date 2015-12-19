@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 
+@SuppressWarnings("deprecation")
 public class EventHandler {
 
     private final HashMap<Location<World>, NoteBlockSongPlayer> noteBlockPlayers = new HashMap<>();

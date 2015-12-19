@@ -24,7 +24,7 @@ public class GiveRadioCommand implements CommandExecutor {
                 .build();
         //noinspection ConstantConditions
         radio.offer(Keys.DISPLAY_NAME, Texts.of("Radio"));
-        ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) radio);
+        ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) (Object) radio);
 
         return CommandResult.success();
     }
