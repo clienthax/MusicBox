@@ -15,5 +15,5 @@ install:
   - cd ..
   - mkdir libs
   - mv NoteBlockAPI/build/libs/*.jar ./libs/*.jar
-  - gradle build
-  
+  - ./gradlew build
+ 
