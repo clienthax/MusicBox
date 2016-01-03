@@ -1,13 +1,10 @@
 sudo: false
+dist: trusty
 
-git:
-  submodules: false
-  
 language: java
 jdk:
   - oraclejdk8
 
-env: GRADLE_OPTS="-Xms1g -Xmx3g"
 install:
   - git clone https://github.com/clienthax/NoteBlockAPI.git
   - cd NoteBlockAPI
@@ -17,3 +14,32 @@ install:
   - mv NoteBlockAPI/build/libs/*.jar ./libs/*.jar
   - ./gradlew build
  
+env:
+  matrix:
+  - GRADLE_OPTS="-Xms1g -Xmx3g"
+  global:
+    secure: IFbrtgMkGsxa92ts2Im6Oi5O2y26eslZPe51yAmvpYIuiDZ9YUo2Ltj6fDBiopoKv04e25f7LwRloHXvQ6iBUSRB59AZ4LoRlPNK0DScLrmmv68gDjW/ktMggPImHDauab4Q7nPRCCt37+TuJ9Eb3aAuKzUKzfa/i+6ZKqBi/4fmvF6UffuBbI0rXK+I71gi31qA3QPWEbwJ6EteYyDP3iGfzkNIpjuPsQCEigNnfIBuEvmYoaMZSW8IM7w7RO3JwBHRsbE3RlqWxrEfzsjPmy+GeTVwzYvHP//1lOcJE6AaWAivK8gIjrrg5iH2OGwIJ4o2hJCIGg4/JegjaWREJH8doBepiGwl+DxuN309ROGwyImyWCOLLm/MMN0m1kzihgRK/dFETVtTeRWneUnBG7Yyvowm4maG7QsMYBM7IsItI58dDtwhGjEAtnnX4HQgbLgSgRjFDyfWWAIN0RfB+XEvUbW6e4PLg37CchIpTddL36d4QnzCKf3sXtIUlWjzcpL72BEyiQPZ/esI1U6nS1HbhNBuR7+i+X60XXIc9OGd5CemISORcD/PZ1jBESFBoIujTyoedxZozxhwqcQHMRPHVxUrSSIAKQuoS94jqn4fauzwjIZ1ycwrM65IVAHMbmSDiX106QsoGw3vu3CthMn2JZLjUCAy88i9nsDzgGg=
+
+before_deploy:
+  - git config credential.helper "store --file=.git/credentials"
+  - echo "https://${GH_TOKEN}:@github.com" > .git/credentials
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$TRAVIS_BRANCH-v0.1.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://${GH_TOKEN}@github.com/clienthax/MusicBox --tags
+  
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: EobolkGoCZa4FH0DWN8gNJ55/LFkISdf0aQmq0uHkosiwd9V30nH00DgQUqx3KPCeH4wnFk2QChDBdMo1SAnSm+BjBcY2te0yBeqTG/NhQitB0YDrD29wQPi6KF3tbumYPNWpB553EKjIr+X0OTKcfi5sorAJTLDGmxks2hx2rUVhAIJBqFhvJA7PXCL275szwFbQUM3wCTxqxrq+rwjO6O55Mhk049sgwD+W8k0Ze6uCZ4IjshO2ZI/4yuFd5OtrFOh1B0JUHZIHqncSCCjftZS4IDUK6QPTPvKHEoFiGPg93eL/EUwbFJC7s5UgDws1MSJh4PRO2jo6NNoGIplG7GX0zSLKLTIn1/TIaadVJakLJh27Hk+vG9Z0Hwdd003B7B8eUE17T6D3x1uTiKgcoesNqkjh/W/2Vhr6W608Zx2PFvLt88YEuqtq8EOE9kiYjiouBPFY699hv1NInW06w3wZnJhsbPFaF3c2LyPFUp17fxpQ680Dq2NCLbe71lT4sxvSAITDPpS69KZ+EyMsooAXQDpHXnBsfYMS4uMNtGSAi3+pLrFZmVEHm0BTfp0pCQVku7WwNS1evlfNLYBeZ/fOd6TmVa/uzjuUTB/8QENrPFtGC1LbNAPYsnK9xLmMR/qpLDTCOCYN9qL4llWl6+80G+Jd6n9eOCa24tYFsU=
+  file: build/libs/musicbox-0.1.jar
+  on:
+    tags: false
+    all_branchs: true
+    repo: clienthax/MusicBox
+
+branches:
+  except:
+    - /^*-v[0-9]/
