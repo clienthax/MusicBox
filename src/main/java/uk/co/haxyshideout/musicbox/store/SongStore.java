@@ -9,7 +9,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import uk.co.haxyshideout.musicbox.MusicBox;
@@ -61,7 +60,7 @@ public class SongStore {
 
         List<Text> giveSongCommandTexts = Lists.newArrayList();
         for(String songName : songNames) {
-            Text item = Texts.builder(songName)
+            Text item = Text.builder(songName)
                     .onClick(TextActions.runCommand("/givesong \""+songName+"\""))
                     .color(TextColors.DARK_AQUA)
                     .build();
@@ -70,15 +69,15 @@ public class SongStore {
 
         List<Text> playSongCommandTexts = Lists.newArrayList();
         for(String songName : songNames) {
-            Text item = Texts.builder(songName)
+            Text item = Text.builder(songName)
                     .onClick(TextActions.runCommand("/playsong \""+songName+"\""))
                     .color(TextColors.DARK_AQUA)
                     .build();
             playSongCommandTexts.add(item);
         }
 
-        giveSongPaginationBuilder = paginationService.builder().title(Texts.of("Songs")).contents(giveSongCommandTexts);
-        playerRadioPaginationBuilder = paginationService.builder().title(Texts.of("Songs")).contents(playSongCommandTexts);
+        giveSongPaginationBuilder = paginationService.builder().title(Text.of("Songs")).contents(giveSongCommandTexts);
+        playerRadioPaginationBuilder = paginationService.builder().title(Text.of("Songs")).contents(playSongCommandTexts);
     }
 
     public Optional<Song> getSong(String songName) {

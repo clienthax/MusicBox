@@ -11,7 +11,7 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import uk.co.haxyshideout.musicbox.commands.DiscListCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveRadioCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveSongCommand;
@@ -76,14 +76,14 @@ public class MusicBox {
         commandDispatcher.register(this, songListSpec, "disclist");
 
         CommandSpec giveSongSpec = CommandSpec.builder().arguments(
-                GenericArguments.onlyOne(GenericArguments.string(Texts.of("songName"))))
+                GenericArguments.onlyOne(GenericArguments.string(Text.of("songName"))))
                 .permission("musicbox.songlist")
                 .executor(new GiveSongCommand())
                 .build();
         commandDispatcher.register(this, giveSongSpec, "givesong");
 
         CommandSpec playSongSpec = CommandSpec.builder().arguments(
-                GenericArguments.onlyOne(GenericArguments.string(Texts.of("songName"))))
+                GenericArguments.onlyOne(GenericArguments.string(Text.of("songName"))))
                 .permission("musicbox.radio")
                 .executor(new PlaySongCommand())
                 .build();

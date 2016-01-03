@@ -1,17 +1,17 @@
 package uk.co.haxyshideout.musicbox.commands;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import uk.co.haxyshideout.musicbox.MusicBox;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
 
 public class GiveRadioCommand implements CommandExecutor {
 
@@ -20,10 +20,11 @@ public class GiveRadioCommand implements CommandExecutor {
             return CommandResult.success();
         Player player = (Player) src;
         @SuppressWarnings("ConstantConditions")
-        ItemStack radio = MusicBox.getInstance().getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ItemTypes.JUKEBOX).quantity(1)
-                .build();
+        ItemStack radio = ItemStack.builder().itemType(ItemTypes.JUKEBOX).quantity(1).build();
         //noinspection ConstantConditions
-        radio.offer(Keys.DISPLAY_NAME, Texts.of("Radio"));
+        radio.offer(Keys.DISPLAY_NAME, Text.of("Radio"));
+//        player.getInventory().offer(radio);
+
         ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) (Object) radio);
 
         return CommandResult.success();

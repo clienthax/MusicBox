@@ -1,8 +1,7 @@
 package uk.co.haxyshideout.musicbox.eventhandlers;
 
-import com.xxmicloxx.NoteBlockAPI.players.NoteBlockSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
-import net.minecraftforge.event.world.BlockEvent;
+import com.xxmicloxx.NoteBlockAPI.players.NoteBlockSongPlayer;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
@@ -15,9 +14,11 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import uk.co.haxyshideout.musicbox.MusicBox;
@@ -61,7 +62,8 @@ public class EventHandler {
             //noinspection ConstantConditions
             if(itemInHand.isPresent() && itemInHand.get().getItem() == ItemTypes
                     .JUKEBOX && itemInHand.get().get(Keys.DISPLAY_NAME).isPresent ()) {
-                String itemName = Texts.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
+                String itemName = TextSerializers.PLAIN.serialize(itemInHand.get().get(Keys.DISPLAY_NAME).get());
+                //String itemName = Text.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
                 if(itemName.equals("Radio")) {
                     event.setCancelled(true);
                     MusicBox.getInstance().getSongStore().sendPlaySongList(player);
@@ -92,6 +94,7 @@ public class EventHandler {
                     //Set the record into the tile entity, need to do it this way as the normal insert removes the name tag
                     jukeboxLocation.offer(Keys.REPRESENTED_ITEM, itemInHand.get().createSnapshot());
 
+                    ItemStackSnapshot itemStackSnapshot = jukeboxLocation.get(Keys.REPRESENTED_ITEM).get();
                     //Remove the disc from the players hand
                     player.setItemInHand(null);
 
@@ -101,7 +104,8 @@ public class EventHandler {
                     }
 
                     //Check that the song exists for the disc name
-                    String songName = Texts.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
+                    String songName = TextSerializers.PLAIN.serialize(itemInHand.get().get(Keys.DISPLAY_NAME).get());
+                    //String songName = Texts.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
                     Optional<Song> song = MusicBox.getInstance().getSongStore().getSong(songName);
                     if(song.isPresent()) {
                         //Set up the player and play the song
@@ -116,12 +120,12 @@ public class EventHandler {
                         Collection<Entity> playersInRange = player.getWorld().getEntities( entity -> entity instanceof Player
                                         && entity.getLocation().getPosition().distance(jukeboxLocation.getPosition()) < 16);
                         for(Entity entity : playersInRange) {
-                            ((Player) entity).sendMessage(ChatTypes.ACTION_BAR, Texts.of(TextColors.AQUA, "Now Playing: " + songName));
+                            ((Player) entity).sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.AQUA, "Now Playing: " + songName));
                         }
 
                     }
                 }
-            } else {
+            } else {//If the disc is already in the box just turn off music for that block when ejected
                 if(noteBlockPlayers.containsKey(jukeboxLocation))
                     noteBlockPlayers.get(jukeboxLocation).setPlaying(false);
             }
