@@ -1,0 +1,19 @@
+sudo: false
+
+git:
+  submodules: false
+  
+language: java
+jdk:
+  - oraclejdk8
+
+env: GRADLE_OPTS="-Xms1g -Xmx3g"
+install:
+  - git clone https://github.com/clienthax/NoteBlockAPI.git
+  - cd NoteBlockAPI
+  - gradle build
+  - cd ..
+  - mkdir libs
+  - mv NoteBlockAPI/build/libs/*.jar ./libs/*.jar
+  - gradle build
+  
