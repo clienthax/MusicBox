@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.NBSDecoder;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -26,8 +26,8 @@ public class SongStore {
 
     //Map of Song names to loaded Songs
     private final HashMap<String, Song> songs = Maps.newHashMap();
-    private PaginationBuilder giveSongPaginationBuilder;
-    private PaginationBuilder playerRadioPaginationBuilder;
+    private PaginationList.Builder giveSongPaginationBuilder;
+    private PaginationList.Builder playerRadioPaginationBuilder;
 
     public SongStore() {
         loadSongs();

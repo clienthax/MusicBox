@@ -4,15 +4,6 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
-
-install:
-  - git clone https://github.com/clienthax/NoteBlockAPI.git
-  - cd NoteBlockAPI
-  - gradle build
-  - cd ..
-  - mkdir libs
-  - mv NoteBlockAPI/build/libs/*.jar ./libs/*.jar
-  - ./gradlew build
  
 env:
   matrix:

@@ -10,6 +10,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 import uk.co.haxyshideout.musicbox.commands.DiscListCommand;
@@ -22,7 +23,7 @@ import uk.co.haxyshideout.musicbox.store.SongStore;
 
 import java.io.File;
 
-@Plugin(name = "MusicBox", id = "musicbox", version = "0.1")
+@Plugin(name = "MusicBox", id = "uk.co.haxyshideout.musicbox", dependencies = @Dependency(id = "com.xxmicloxx.noteblockapi"))
 public class MusicBox {
 
     @Inject
