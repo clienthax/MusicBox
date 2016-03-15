@@ -29,7 +29,8 @@ public class GiveSongCommand implements CommandExecutor {
             if(song.isPresent()) {
                 ItemStack record = ItemStack.builder().itemType(ItemTypes.RECORD_CAT).quantity(1).build();
                 Text name = Text.of(songName.get());
-                record.offer(Keys.DISPLAY_NAME, name);
+                record.offer(Keys.DISPLAY_NAME, name);//Set the item name to match the song name
+                record.offer(Keys.HIDE_MISCELLANEOUS, true);//Hide the original item name
                 player.getInventory().offer(record);
             } else {
                 player.sendMessage(Text.of("No song by the name of "+songName.get()+" was found."));
