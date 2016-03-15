@@ -12,6 +12,7 @@ env:
   - secure: d5iOZ+OG2/072rJJ2UCBtWPFqXc0/Gylq4yN57vWOt30hRbR6CKV8R+xAoV1TMVSrtZq+fMTt2z1G5b4hlVvjXdrSAFgi+PRWWl5Tfy/Wm60RFs8DJY8qR+UlqhsixyE6pclyk9m6tyhOM02WD1bSVSmarIe5JmpL68FxoXR5sG5semZSIRapl6R2Ohz9KHhvZ1/kDhiCUWxMpcEcEEBQz3kTZldrgXLt4eKdCWxTfch4tB25a1ztLd9Xcum3maZLa3uFDaKAfhvujmn+Bq33lqUdT2MGDZ6Qs8Izb2+D3M9eA8YHi89VhxeyUrNxbHm4g4t75P7Ujqhzi5F16U1dR3Uhy8SF1tiuXu95G+LIpb0epHBQHNe7Ht/9YVcVtQB0vu3PSP4JuA1m0o8lfQRy6Thof0+sXOv274pwyqOu0h8DcWYb1yMO0G+dfjwwISIc+iLYxw7OHN8iUAFJmDVji8kI7qf+xb2UcRGNVe2fdxjwnTaArVWUsAEih7/YpvNL2k2Ke2C3vEPWmLdchEbAMBrIkn+jjty6FwWafzKqaXmI8LKYOVKs6vi9phvNMX4dD6ibHWsWVdwenL7bhQYQxPSKKQkoLjOR4DOI/Xarr+PxJkk/8lChiegt4Pty7AccEPohZmTIrTbQe+cwmyK5NNpOqnEAYyJ6ZmAxkC0IBU=
 
 before_deploy:
+  - versionNum=$(grep -Po '(?<=version=).*' gradle.properties)
   - git config credential.helper "store --file=.git/credentials"
   - echo "https://${GH_TOKEN}:@github.com" > .git/credentials
   - git config --global user.email "builds@travis-ci.com"
@@ -25,7 +26,7 @@ deploy:
   provider: releases
   api_key:
     secure: e7BVyAkIPH7cD/LQ6GccH8VNsSeGOdbIidw7yOKVlP38UlNXFF1+1iGIetNHYi+zCtCcq5yaBzird11n6DpAAzl4BkZjOTaGlUFaccBmLc8AtKRfiKflchuKhoM5Vg3zVyXPnyi8pv5+EF3bT6OFMQTWstVHRaoX1KBRCJ4KpJid3mXeFFf6oapRICsqcVgDoKUC63vm7xo/SvVyTIsjTuByGnN2N+3Wxb1OnVScEHADuAD1soFCKZFY+vUaAEuvFFmJSvOghRkUsM4mh4MpbpzoD+9ppk6+B3uS11IwEWVYXIN4G8cfKDbJSTsey73pX/3LUVJT+4JVtcIvWvfkNocPrVMCNrcMsDErrfazIhqApwvv56GuUpmRHFMmEHGAqkTJTz6PrpVUgqKTQQ8fWj8zFEVxqEMUsk7dAw/7KN9Iz9TTVaWrX1L9MADviep8i4YNCE17+b3aiGBiEkjH1zjJEdrGqQXaBmJWL7IA1NLxeUyTV1gjZ71hZLKGQBzXhED/XfySU00dn4ohFj12WrI/V0m0SUXHJ4o2RtL4znbY7q3M7RQPCkMqZba7MFqhIQL3+13qSm7lDQqNHHan5hxVZIkPQSYrEm5fvlrfO+BbOKzr6/j2wE8IEh7GMofEv+B+Cbhsw0V9Nb4aIALbcow5M0c4mMBpd1bNS7OheB8=
-  file: build/libs/musicbox-0.2.jar
+  file: build/libs/musicbox-${versionNum}.jar
   on:
     tags: false
     all_branchs: true
