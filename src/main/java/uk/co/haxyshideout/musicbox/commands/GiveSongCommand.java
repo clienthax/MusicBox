@@ -1,12 +1,10 @@
 package uk.co.haxyshideout.musicbox.commands;
 
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
-import net.minecraft.entity.player.EntityPlayerMP;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -32,9 +30,7 @@ public class GiveSongCommand implements CommandExecutor {
                 ItemStack record = ItemStack.builder().itemType(ItemTypes.RECORD_CAT).quantity(1).build();
                 Text name = Text.of(songName.get());
                 record.offer(Keys.DISPLAY_NAME, name);
-  //              InventoryTransactionResult result = player.getInventory().set(record);//Why the hell doesnt this work -.-?
-
-                ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) (Object) record);
+                player.getInventory().offer(record);
             } else {
                 player.sendMessage(Text.of("No song by the name of "+songName.get()+" was found."));
             }

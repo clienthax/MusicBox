@@ -1,7 +1,5 @@
 package uk.co.haxyshideout.musicbox.commands;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -23,10 +21,7 @@ public class GiveRadioCommand implements CommandExecutor {
         ItemStack radio = ItemStack.builder().itemType(ItemTypes.JUKEBOX).quantity(1).build();
         //noinspection ConstantConditions
         radio.offer(Keys.DISPLAY_NAME, Text.of("Radio"));
-//        player.getInventory().offer(radio);
-
-        ((EntityPlayerMP)player).inventory.addItemStackToInventory((net.minecraft.item.ItemStack) (Object) radio);
-
+        player.getInventory().offer(radio);
         return CommandResult.success();
     }
 }
