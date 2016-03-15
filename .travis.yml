@@ -25,7 +25,7 @@ deploy:
   provider: releases
   api_key:
     secure: e7BVyAkIPH7cD/LQ6GccH8VNsSeGOdbIidw7yOKVlP38UlNXFF1+1iGIetNHYi+zCtCcq5yaBzird11n6DpAAzl4BkZjOTaGlUFaccBmLc8AtKRfiKflchuKhoM5Vg3zVyXPnyi8pv5+EF3bT6OFMQTWstVHRaoX1KBRCJ4KpJid3mXeFFf6oapRICsqcVgDoKUC63vm7xo/SvVyTIsjTuByGnN2N+3Wxb1OnVScEHADuAD1soFCKZFY+vUaAEuvFFmJSvOghRkUsM4mh4MpbpzoD+9ppk6+B3uS11IwEWVYXIN4G8cfKDbJSTsey73pX/3LUVJT+4JVtcIvWvfkNocPrVMCNrcMsDErrfazIhqApwvv56GuUpmRHFMmEHGAqkTJTz6PrpVUgqKTQQ8fWj8zFEVxqEMUsk7dAw/7KN9Iz9TTVaWrX1L9MADviep8i4YNCE17+b3aiGBiEkjH1zjJEdrGqQXaBmJWL7IA1NLxeUyTV1gjZ71hZLKGQBzXhED/XfySU00dn4ohFj12WrI/V0m0SUXHJ4o2RtL4znbY7q3M7RQPCkMqZba7MFqhIQL3+13qSm7lDQqNHHan5hxVZIkPQSYrEm5fvlrfO+BbOKzr6/j2wE8IEh7GMofEv+B+Cbhsw0V9Nb4aIALbcow5M0c4mMBpd1bNS7OheB8=
-  file: build/libs/musicbox-0.1.jar
+  file: build/libs/musicbox-0.2.jar
   on:
     tags: false
     all_branchs: true
