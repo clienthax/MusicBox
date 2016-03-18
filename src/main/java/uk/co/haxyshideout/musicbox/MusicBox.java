@@ -9,6 +9,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -18,6 +19,9 @@ import uk.co.haxyshideout.musicbox.commands.GiveRadioCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveSongCommand;
 import uk.co.haxyshideout.musicbox.commands.PlaySongCommand;
 import uk.co.haxyshideout.musicbox.commands.ReloadSongsCommand;
+import uk.co.haxyshideout.musicbox.data.spongedata.ImmutableMusicBoxSettingsData;
+import uk.co.haxyshideout.musicbox.data.spongedata.MusicBoxSettingsData;
+import uk.co.haxyshideout.musicbox.data.spongedata.MusicBoxSettingsDataBuilder;
 import uk.co.haxyshideout.musicbox.eventhandlers.EventHandler;
 import uk.co.haxyshideout.musicbox.store.SongStore;
 
@@ -49,10 +53,15 @@ public class MusicBox {
 
     /*
     TODO / IDEAS
-    make it so the player unlocks music tracks by putting the discs into the jukebox, then display the list of songs they have unlocked when they
-    click the jukebox, add discs to dung gen?
+    add discs to dung gen?
 
      */
+
+    @Listener
+    public void init(GameInitializationEvent event) {
+        Sponge.getDataManager().register(MusicBoxSettingsData.class, ImmutableMusicBoxSettingsData.class, new MusicBoxSettingsDataBuilder());
+    }
+
     @Listener
     public void onStarted(GamePostInitializationEvent event) {
         instance = this;
