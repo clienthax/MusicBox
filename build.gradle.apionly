@@ -1,0 +1,17 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.5.1'
+}
+
+defaultTasks 'clean', 'build'
+
+archivesBaseName = project.name.toLowerCase()
+version = project.version
+
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile "org.spongepowered:spongeapi:${project.apiVersion}"
+    compile 'com.github.clienthax:NoteBlockAPI:master-SNAPSHOT'
+}
