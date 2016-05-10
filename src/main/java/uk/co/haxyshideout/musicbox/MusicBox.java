@@ -54,6 +54,7 @@ public class MusicBox {
     /*
     TODO / IDEAS
     add discs to dung gen?
+    Region based music (settable regions that play a playlist/single song)
 
      */
 
