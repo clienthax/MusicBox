@@ -5,12 +5,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.NBSDecoder;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.weighted.LootTable;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.gen.Populator;
+import org.spongepowered.api.world.gen.populator.Dungeon;
 import uk.co.haxyshideout.musicbox.MusicBox;
 
 import java.io.File;
@@ -52,6 +58,12 @@ public class SongStore {
             }
             buildPaginatedLists();
         }).submit(musicBox);
+
+        registerDungeonLoot();
+    }
+
+    private void registerDungeonLoot() {
+        //TODO
     }
 
     private void buildPaginatedLists() {

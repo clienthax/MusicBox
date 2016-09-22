@@ -72,19 +72,6 @@ public class ImmutableMusicBoxSettingsData extends AbstractImmutableData<Immutab
     }
 
     @Override
-    public int compareTo(ImmutableMusicBoxSettingsData o) {
-        ComparisonChain comparisonChain = ComparisonChain.start()
-                .compare(this.musicBoxType, o.musicBoxType);
-        if(this.inventoryDirection != null && o.inventoryDirection != null) {
-            comparisonChain = comparisonChain.compare(this.inventoryDirection, o.inventoryDirection);
-        }
-        if(this.inventorySlot != null && o.inventorySlot != null) {
-            comparisonChain = comparisonChain.compare(this.inventorySlot, o.inventorySlot);
-        }
-        return comparisonChain.result();
-    }
-
-    @Override
     public int getContentVersion() {
         return 0;
     }

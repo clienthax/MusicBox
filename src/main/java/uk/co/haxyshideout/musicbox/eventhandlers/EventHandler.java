@@ -5,15 +5,14 @@ import com.google.common.collect.HashBiMap;
 import com.xxmicloxx.NoteBlockAPI.decoders.nbs.Song;
 import com.xxmicloxx.NoteBlockAPI.events.SongEndEvent;
 import com.xxmicloxx.NoteBlockAPI.players.NoteBlockSongPlayer;
-import net.minecraft.inventory.IInventory;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -22,8 +21,9 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,7 +37,6 @@ import uk.co.haxyshideout.musicbox.data.spongedata.MusicBoxKeys;
 import uk.co.haxyshideout.musicbox.data.spongedata.MusicBoxSettingsData;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Optional;
 
 @SuppressWarnings("deprecation")
@@ -82,20 +81,25 @@ public class EventHandler {
 
     @Listener
     public void onItemInteract(InteractBlockEvent.Secondary event, @First Player player) {
-        Optional<ItemStack> itemInHand = player.getItemInHand();
+        Optional<ItemStack> itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
         //noinspection ConstantConditions
         if (itemInHand.isPresent() && itemInHand.get().getItem() == ItemTypes
                 .JUKEBOX && itemInHand.get().get(Keys.DISPLAY_NAME).isPresent()) {
             String itemName = TextSerializers.PLAIN.serialize(itemInHand.get().get(Keys.DISPLAY_NAME).get());
             if (itemName.equals("Radio")) {
                 event.setCancelled(true);
+                //Stop the radio from playing
+                if(PlaySongCommand.radioSongPlayers.containsKey(player.getUniqueId())) {
+                    PlaySongCommand.radioSongPlayers.get(player.getUniqueId()).setPlaying(false);
+                }
+                //Send the song list to the player
                 MusicBox.getInstance().getSongStore().sendPlaySongList(player);
             }
         }
     }
 
     @Listener
-    public void onInteractWithJukebox(InteractBlockEvent.Secondary event, @First Player player) {
+    public void onInteractWithJukebox(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         //If the block interacted with is not a jukebox, return
         //noinspection ConstantConditions
         if (event.getTargetBlock().getState().getType() != BlockTypes.JUKEBOX) {
@@ -124,15 +128,11 @@ public class EventHandler {
                         for (Direction direction : CARDINAL_SET) {
                             Optional<TileEntity> teNextToJukeboxOptional = worldLocation.add(direction.toVector3d()).getTileEntity();
                             if(teNextToJukeboxOptional.isPresent()) {
-
-                                //TODO One day. i will be able to do this with the api -.-
-                                net.minecraft.tileentity.TileEntity teNextToJukeBox = (net.minecraft.tileentity.TileEntity) teNextToJukeboxOptional.get();
-                                if (teNextToJukeBox instanceof IInventory) {
-                                    IInventory iInventory = (IInventory) teNextToJukeBox;
-                                    TileEntityCarrier tileEntityCarrier = (TileEntityCarrier) teNextToJukeBox;
-                                    if(iInventory.getSizeInventory() >= 8) {
-                                        player.sendMessage(Text.of(TextColors.AQUA, "Found a ", tileEntityCarrier.getType().getName(), " to the ", direction.name().toLowerCase(), " slots: ", iInventory.getSizeInventory()));
-
+                                TileEntity teNextToJukeBox = teNextToJukeboxOptional.get();
+                                if (teNextToJukeBox instanceof TileEntityInventory) {
+                                    TileEntityInventory<?> tileEntityInventory = (TileEntityInventory<?>) teNextToJukeBox;
+                                    if(tileEntityInventory.capacity() >= 8) {
+                                        player.sendMessage(Text.of(TextColors.AQUA, "Found a ", tileEntityInventory.getName(), " to the ", direction.name().toLowerCase(), " with ", tileEntityInventory.capacity()+" slots."));
                                         musicBoxType = MusicBoxKeys.MusicBoxType.CHEST;
                                         setting.set(MusicBoxKeys.INVENTORY_DIRECTION, Optional.of(direction));
                                         setting.set(MusicBoxKeys.INVENTORY_SLOT, Optional.of(0));
@@ -161,7 +161,7 @@ public class EventHandler {
         }
 
         //Check that the item in the players hand is a record and that it has a custom display name
-        Optional<ItemStack> stackInHand = player.getItemInHand();
+        Optional<ItemStack> stackInHand = player.getItemInHand(HandTypes.MAIN_HAND);
         Location<World> jukeboxLocation = event.getTargetBlock().getLocation().get();
         //Only insert the disc if the jukebox doesn't have a disc inside it
         TileEntity tileEntity = jukeboxLocation.getTileEntity().get();
@@ -177,7 +177,7 @@ public class EventHandler {
                     jukeboxLocation.offer(Keys.REPRESENTED_ITEM, stackInHand.get().createSnapshot());
 
                     //Remove the disc from the players hand
-                    player.setItemInHand(null);
+                    player.setItemInHand(HandTypes.MAIN_HAND, null);
 
                     //Turn off any players at the blocks location first
                     if (noteBlockPlayers.containsKey(jukeboxLocation)) {
@@ -248,26 +248,24 @@ public class EventHandler {
 
                 Optional<TileEntity> inventoryTileEntityOptional = jukeBoxLocation.add(invDirection.toVector3d()).getTileEntity();
                 if(inventoryTileEntityOptional.isPresent()) {
-                    net.minecraft.tileentity.TileEntity teNextToJukeBox = (net.minecraft.tileentity.TileEntity) inventoryTileEntityOptional.get();
-                    if (teNextToJukeBox instanceof IInventory) {
-                        IInventory iInventory = (IInventory) teNextToJukeBox;
+                    TileEntity teNextToJukeBox = inventoryTileEntityOptional.get();
+                    if (teNextToJukeBox instanceof TileEntityCarrier) {
+                        TileEntityInventory<?> tileEntityInventory = (TileEntityInventory<?>) teNextToJukeBox;
                         //Make sure we don't npe
-                        if(currentPlayingSlot >= iInventory.getSizeInventory()) {
+                        if(currentPlayingSlot >= tileEntityInventory.capacity()) {
                             currentPlayingSlot = 0;
                         }
 
                         int newSlot;
-                        for (newSlot = currentPlayingSlot; newSlot < iInventory.getSizeInventory(); newSlot++) {
-                            ItemStack stackInSlot = (ItemStack) (Object) iInventory.getStackInSlot(newSlot);
-                            if(stackInSlot != null) {
-                                if (stackInSlot.getItem() == ItemTypes.RECORD_CAT && stackInSlot.get(Keys.DISPLAY_NAME)
+                        for (newSlot = currentPlayingSlot; newSlot < tileEntityInventory.capacity(); newSlot++) {
+                            Optional<ItemStack> stackInSlot = tileEntityInventory.query(new SlotIndex(newSlot)).peek();
+                            if(stackInSlot.isPresent()) {
+                                if (stackInSlot.get().getItem() == ItemTypes.RECORD_CAT && stackInSlot.get().get(Keys.DISPLAY_NAME)
                                         .isPresent()) {
                                     //Check that the song exists for the disc name
-                                    String songName = TextSerializers.PLAIN.serialize(stackInSlot.get(Keys.DISPLAY_NAME).get());
-                                    //String songName = Texts.legacy().to(itemInHand.get().get(Keys.DISPLAY_NAME).get());
+                                    String songName = TextSerializers.PLAIN.serialize(stackInSlot.get().get(Keys.DISPLAY_NAME).get());
                                     Optional<Song> song = MusicBox.getInstance().getSongStore().getSong(songName);
                                     if(song.isPresent()) {
-
                                         NoteBlockSongPlayer noteBlockSongPlayer = new NoteBlockSongPlayer(song.get());
                                         noteBlockSongPlayer.setNoteBlockLocation(jukeBoxLocation);
                                         noteBlockSongPlayer.setAreaMusic(true);
@@ -282,14 +280,13 @@ public class EventHandler {
                                             ((Player) entity).sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.AQUA, "Now Playing: " + songName));
                                         }
 
-
                                         currentPlayingSlot = ++newSlot;
                                         break;
                                     }
                                 }
                             } else {
-                                //Failed to find a new song, reset to 0
-                                if(newSlot == iInventory.getSizeInventory() - 1) {
+                                //Failed to find a new song, reset to slot 0
+                                if(newSlot == tileEntityInventory.capacity() - 1) {
                                     currentPlayingSlot = 0;
                                 }
                             }

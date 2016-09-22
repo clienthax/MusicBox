@@ -27,7 +27,7 @@ import uk.co.haxyshideout.musicbox.store.SongStore;
 
 import java.io.File;
 
-@Plugin(name = "MusicBox", id = "uk.co.haxyshideout.musicbox", dependencies = @Dependency(id = "com.xxmicloxx.noteblockapi"))
+@Plugin(name = "MusicBox", id = "musicbox", dependencies = @Dependency(id = "noteblockapi"))
 public class MusicBox {
 
     @Inject
