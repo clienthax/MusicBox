@@ -45,8 +45,8 @@ public class EventHandler {
     //BiMap lets us look up keys+values in reverse
     private final BiMap<Location<World>, NoteBlockSongPlayer> noteBlockPlayers = HashBiMap.create();
 
-    private static final Direction[] CARDINAL_SET = {
-            Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST
+    private static final Direction[] VALID_DIRECTIONS = {
+            Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN
     };
 
     @Listener
@@ -125,7 +125,7 @@ public class EventHandler {
                     if(musicBoxType == MusicBoxKeys.MusicBoxType.STANDARD) {
                         //Find inventories next to the block
                         boolean foundChest = false;
-                        for (Direction direction : CARDINAL_SET) {
+                        for (Direction direction : VALID_DIRECTIONS) {
                             Optional<TileEntity> teNextToJukeboxOptional = worldLocation.add(direction.toVector3d()).getTileEntity();
                             if(teNextToJukeboxOptional.isPresent()) {
                                 TileEntity teNextToJukeBox = teNextToJukeboxOptional.get();
