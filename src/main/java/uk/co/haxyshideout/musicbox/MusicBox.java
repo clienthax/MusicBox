@@ -8,11 +8,13 @@ import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import uk.co.haxyshideout.musicbox.commands.DiscListCommand;
 import uk.co.haxyshideout.musicbox.commands.GiveRadioCommand;
@@ -35,6 +37,9 @@ public class MusicBox {
     @Inject
     @ConfigDir(sharedRoot = false)
     private File configFolder;
+
+    @Inject
+    PluginContainer container;
 
     private static MusicBox instance;
     private SongStore songStore;
@@ -60,7 +65,13 @@ public class MusicBox {
 
     @Listener
     public void init(GameInitializationEvent event) {
-        Sponge.getDataManager().register(MusicBoxSettingsData.class, ImmutableMusicBoxSettingsData.class, new MusicBoxSettingsDataBuilder());
+                DataRegistration.builder()
+                                .dataClass(MusicBoxSettingsData.class)
+                                .immutableClass(ImmutableMusicBoxSettingsData.class)
+                                .builder(new MusicBoxSettingsDataBuilder())
+                                .manipulatorId("musicbox_settings")
+                                .dataName("musicboxData")
+                        .buildAndRegister(container);
     }
 
     @Listener

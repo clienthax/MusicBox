@@ -126,7 +126,7 @@ public class EventHandler {
                         //Find inventories next to the block
                         boolean foundChest = false;
                         for (Direction direction : VALID_DIRECTIONS) {
-                            Optional<TileEntity> teNextToJukeboxOptional = worldLocation.add(direction.toVector3d()).getTileEntity();
+                            Optional<TileEntity> teNextToJukeboxOptional = worldLocation.add(direction.asOffset()).getTileEntity();
                             if(teNextToJukeboxOptional.isPresent()) {
                                 TileEntity teNextToJukeBox = teNextToJukeboxOptional.get();
                                 if (teNextToJukeBox instanceof TileEntityInventory) {
@@ -246,7 +246,7 @@ public class EventHandler {
                 Direction invDirection = setting.get(MusicBoxKeys.INVENTORY_DIRECTION).get().get();
                 Integer currentPlayingSlot = setting.get(MusicBoxKeys.INVENTORY_SLOT).get().get();
 
-                Optional<TileEntity> inventoryTileEntityOptional = jukeBoxLocation.add(invDirection.toVector3d()).getTileEntity();
+                Optional<TileEntity> inventoryTileEntityOptional = jukeBoxLocation.add(invDirection.asOffset()).getTileEntity();
                 if(inventoryTileEntityOptional.isPresent()) {
                     TileEntity teNextToJukeBox = inventoryTileEntityOptional.get();
                     if (teNextToJukeBox instanceof TileEntityCarrier) {
