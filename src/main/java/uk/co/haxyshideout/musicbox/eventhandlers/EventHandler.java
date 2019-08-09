@@ -22,6 +22,7 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.text.Text;
@@ -167,7 +168,8 @@ public class EventHandler {
         TileEntity tileEntity = jukeboxLocation.getTileEntity().get();
         MusicBoxSettingsData setting = tileEntity.get(MusicBoxSettingsData.class).orElse(new MusicBoxSettingsData());
         MusicBoxKeys.MusicBoxType musicBoxType = setting.get(MusicBoxKeys.MUSIC_BOX_TYPE).get();
-        if (!jukeboxLocation.get(Keys.REPRESENTED_ITEM).isPresent()) {
+        Optional<ItemStackSnapshot> itemStackSnapshot = jukeboxLocation.get(Keys.REPRESENTED_ITEM);
+        if (!itemStackSnapshot.isPresent() || itemStackSnapshot.get().isEmpty()) {
             if(musicBoxType == MusicBoxKeys.MusicBoxType.STANDARD) {
                 if (stackInHand.isPresent() && stackInHand.get().getItem() == ItemTypes.RECORD_CAT && stackInHand.get().get(Keys.DISPLAY_NAME)
                         .isPresent()) {

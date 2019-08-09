@@ -45,6 +45,6 @@ dependencies {
     compile("org.spongepowered:spongeapi:${project.apiVersion}") {
         transitive = true
     }
-	compile 'com.github.clienthax:NoteBlockAPI:master-SNAPSHOT'
+	compile 'com.github.clienthax:NoteBlockAPI:api7-SNAPSHOT'
 
 }

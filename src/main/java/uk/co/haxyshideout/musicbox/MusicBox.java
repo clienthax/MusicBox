@@ -69,9 +69,9 @@ public class MusicBox {
                                 .dataClass(MusicBoxSettingsData.class)
                                 .immutableClass(ImmutableMusicBoxSettingsData.class)
                                 .builder(new MusicBoxSettingsDataBuilder())
-                                .manipulatorId("musicbox_settings")
-                                .dataName("musicboxData")
-                        .buildAndRegister(container);
+                                .id("musicbox_settings")
+                                .name("musicboxData")
+                        .build();
     }
 
     @Listener
